@@ -16,6 +16,8 @@ Importing the `crowdfunding_info` worksheet.
 
 `crowdfunding_info_df.head()`
 
+![crowdfunding_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/crowdfunding_info.png)
+
 
 `pd.set_option('max_colwidth', 400)`
 
@@ -24,8 +26,7 @@ Importing the `crowdfunding_info` worksheet.
 `contact_info_df.head()`
 
 
-
-![crowdfunding_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/crowdfunding_info.png)
+![contact_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/contact_info_df.png)
 
 
 Importing the `contact_info` worksheet.
