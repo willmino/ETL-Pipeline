@@ -2,7 +2,7 @@
 
 ## Overview
 
-Independent Funding, a crowdfunding platform, needed to transfer its on premesis excel database into a PostgreSQL database. I set up an automated datapipeline which handles the following tasks:
+I transferred "Independent Funding" data from on premesis excel database to a Postgres Data Warehouse using an automated pipeline (Python + SQL).
 - ETL of particular CSV file
 - Raw data SQL database
 - SQL Data Warehouse
@@ -11,8 +11,7 @@ Independent Funding, a crowdfunding platform, needed to transfer its on premesis
 
 ### Analysis
 
-Before constructing the database, we needed to extract relevant information from the `backer_info.csv` file. This file was a table and each row was a dictionary of key value pairs corresponding to each column header and row value of an entire row. To extract the relevant information, the csv file was loaded into a pandas DataFrame.
-
+The `backer_info.csv` file needed cleaning. I converted a dataframe json objects into a pandas dataframe with keys as columns and rows as object values.
 `pd.set_option('max_colwidth', 400)`
 
 `backer_info = pd.read_csv("backer_info.csv")`
@@ -23,15 +22,14 @@ Before constructing the database, we needed to extract relevant information from
 
 ![backer_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backer_info.png)
 
-This code converts each key of the json object to columns and each value as the column fields in a pandas dataframe.
+This code converted each key of the json object to columns and each value as the column fields in a pandas dataframe.
 
 `backers_df = pd.json_normalize(backer_df['backer_info'].apply(pd.io.json.loads))`
 `backers_df`
 
 ![backer_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers_d01.png)
 
-We then separated the `name` column into two columns denoted as `first_name` and `last_name`.
-The code block to execute this was:
+The `name` column was split into `first_name` and `last_name` columns.
 
 `backers_df[["first_name", "last_name"]] = backers_df["name"].str.split(" ", n=1, expand=True)`
 
@@ -45,20 +43,17 @@ The DataFrame was exported to a csv file with the following code:
 
 Finally, we were able to begin constructing our database.
 
-The five csv files were used to construct our database: `contacts.csv`, `category.csv`, `subcategory.csv`, `campaign.csv`, `backers.csv`. There were five csv files and four of these files were each linked to the `campaign.csv` file. The layout of the database is listed below:
-
+The five csv files were used to construct our database: `contacts.csv`, `category.csv`, `subcategory.csv`, `campaign.csv`, `backers.csv`. There were five csv files and four of these files were each linked to the `campaign.csv` file. Schema below:
 ![crowdfunding_db_relationships](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/crowdfunding_db_relationships.png)
 
 ## Automatic Schema Creation for Database
-I executed a python script via sqlAlchemy code. This script automatically generated a schema from each input csv file from the employer.
-The script then automatically writes the csv file data to each SQL table.
+I executed a python script via sqlAlchemy. This script generated a schema for each csv file from the employer.
+The script then automatically wrote the csv file data to SQL tables.
 
 
 ![backers_table](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers.png)
 
-Refer to the SQL file for the query code for the corresponding resulting tables:
-
-[SQL_queries](https://github.com/willmino/Crowdfunding-ETL/blob/main/queries/crowdfunding_SQL_Analysis.sql)
+Refer to the [data_pipeline.ipynb script](https://github.com/willmino/Crowdfunding-ETL/blob/main/scripts/data_pipeline.ipynb) for the query code.
 
 ## Results
 
