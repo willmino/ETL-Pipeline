@@ -58,8 +58,6 @@ The below block of code iterated through each row of the resulting DataFrame, fi
 
 When we print the `dict_rows` variable, we can see that it is now a list of of lists. Each list within the parental list is a row and serves as the row's values which are separated by commas. Each item separated by commas indicates the value for each column in the dataframe we are going to create. A sample image of the resulting list of lists is visualized below:
 
-![backer_df_row_values](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backer_df_row_values.png)
-
 
 We then transformed this list of lists into a pandas DataFrame using the below block of code. Notice that we manually designated the column names, but imported the list `dict_values` as the primary set of rows for the resulting dataframe.
 
