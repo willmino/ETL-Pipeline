@@ -2,7 +2,12 @@
 
 ## Overview
 
-Independent Funding, a crowdfunding platform, tasked Britta and me with transferring its large CSV file into a PostgreSQL database. I worked with Britta to Extract and Transform a large amount of information from one csv file into four distinct CSV files. The CSV files were connected to each other through primary and foreign keys to construct a database schema and Entity Relationship Diagram (ERD). The schema was then constructed in PostgreSQL using `CREATE TABLE` queries. The CSV files were subsequently loaded into the database using the import functions within PostgreSQL. Finally, SQL queries were performed to generate relevant aggregate information for reports to stakeholders regarding the number of backers on each campaign and the corresponding remaining dollar figures left towards the funding goals.
+Independent Funding, a crowdfunding platform, needed to transfer its on premesis excel database into a PostgreSQL database. I set up an automated datapipeline which handles the following tasks:
+- ETL of particular CSV file
+- Raw data SQL database
+- SQL Data Warehouse
+- Automatic Schema generation for tables for input csv files
+- Automatic writing of csv file data to SQL tables
 
 ### Analysis
 
@@ -21,51 +26,9 @@ Before constructing the database, we needed to extract relevant information from
 The below block of code iterated through each row of the resulting DataFrame, first creating a list of lists. Each list item was a string that contained its own dictionary. The line `data = row[0]` sets the variable `data` equal to accessing the first index position 0 and sole element of each list. This sole element was a list containing a python dictionary wrapped in quotes as a string. The `json.loads()` function then took the string text of each row and converted it to a json file. Now that each row was a json file, we could iterate through it like a dictionary. Then, using list comprehension, we iterated through each row/dictionary and extracted the value for every key,value pair in the json format data. The line `row_values = [v for k,v in converted_data.items()]` specifically takes all of the values from each json format data row, and adds it to a list that pertains to every row of the DataFrame we wish to construct. 
 
 
-`dict_backer = []`
-
-`dict_rows = []`
-
-`for i,row in backer_df.iterrows():`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# backer_df.iterrows() creates a list of lists, each list is a row from the dataframe`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# and it contains a string enclosing a dictionary containing the row's`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# information. Use index pos 0 to access the string`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`data = row[0]`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# convert each row, initially starting as a string, to a python dictionary`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`converted_data = json.loads(data)`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# Dictionary Manipulation: Iterate through each dictionary (row) and get the`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# values for each row using list comprehension.`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`columns = [k for k,v in converted_data.items()]`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`row_values = [v for k,v in converted_data.items()]`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`# Append the list of values for each row to a list.`
-    
-&nbsp;&nbsp;&nbsp;&nbsp;`dict_rows.append(row_values)`
 
 
-`# Print out the list of values for each row.`
 
-`print(dict_rows)`
-
-When we print the `dict_rows` variable, we can see that it is now a list of of lists. Each list within the parental list is a row and serves as the row's values which are separated by commas. Each item separated by commas indicates the value for each column in the dataframe we are going to create. A sample image of the resulting list of lists is visualized below:
-
-
-We then transformed this list of lists into a pandas DataFrame using the below block of code. Notice that we manually designated the column names, but imported the list `dict_values` as the primary set of rows for the resulting dataframe.
-
-`backers_df = pd.DataFrame(dict_rows, columns = ["backer_id", "cf_id", "name", "email"])`
-
-`backers_df.head(10)`
-
-The resulting DataFrame was visualized below:
 
 ![backer_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers_d01.png)
 
@@ -75,8 +38,6 @@ The code block to execute this was:
 `backers_df[["first_name", "last_name"]] = backers_df["name"].str.split(" ", n=1, expand=True)`
 
 `backers_df`
-
-This resulted in the following modified dataframe.
 
 ![backers_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers_df.png)
 
@@ -90,116 +51,10 @@ The five csv files were used to construct our database: `contacts.csv`, `categor
 
 ![crowdfunding_db_relationships](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/crowdfunding_db_relationships.png)
 
-The resulting schema allowed us to perform `CREATE TABLE` queries. `ALTER TABLE` queries were also used to clarify the relationship between primary and foreign keys within the database.
-The code block below illustrates the table construction within our database.
+## Automatic Schema Creation for Database
+I executed a python script via sqlAlchemy code. This script automatically generated a schema from each input csv file from the employer.
+The script then automatically writes the csv file data to each SQL table.
 
-
-
-`CREATE TABLE "campaign" (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"cf_id" int   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"contact_id" int   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"company_name" varchar(100)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"description" text   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"goal" numeric(10,2)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"pledged" numeric(10,2)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"outcome" varchar(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"backers_count" int   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"country" varchar(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"currency" varchar(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"launch_date" date   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"end_date" date   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"category_id" varchar(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"subcategory_id" varchar(10)   NOT NULL`
-`);`
-
-`CREATE TABLE "category" (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"category_id" varchar(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"category_name" varchar(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`CONSTRAINT "pk_category" PRIMARY KEY (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`"category_id"`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`)`
-`);`
-
-`CREATE TABLE "subcategory" (`
-&nbsp;&nbsp;&nbsp;&nbsp;`"subcategory_id" varchar(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"subcategory_name" varchar(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`CONSTRAINT "pk_subcategory" PRIMARY KEY (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`"subcategory_id"`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`)`
-`);`
-
-`CREATE TABLE "contacts" (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"contact_id" int   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"first_name" varchar(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"last_name" varchar(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"email" varchar(100)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`CONSTRAINT "pk_contacts" PRIMARY KEY (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`"contact_id"`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`)`
-`);`
-
-`CREATE TABLE "backers" (`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"backer_id" VARCHAR(10)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"cf_id" int  NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"first_name" VARCHAR(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"last_name" VARCHAR(50)   NOT NULL,`
-
-&nbsp;&nbsp;&nbsp;&nbsp;`"email" VARCHAR(50)   NOT NULL`
-
-`);`
-
-
-
-`ALTER TABLE "campaign" ADD CONSTRAINT "pk_capmaign_cf_id" PRIMARY KEY("cf_id")`
-
-`ALTER TABLE "campaign" ADD CONSTRAINT "fk_campaign_contact_id" FOREIGN KEY("contact_id")`
-`REFERENCES "contacts" ("contact_id");`
-
-`ALTER TABLE "campaign" ADD CONSTRAINT "fk_campaign_category_id" FOREIGN KEY("category_id")`
-`REFERENCES "category" ("category_id");`
-
-`ALTER TABLE "campaign" ADD CONSTRAINT "fk_campaign_subcategory_id" FOREIGN KEY("subcategory_id")`
-`REFERENCES "subcategory" ("subcategory_id");`
-
-`ALTER TABLE "backers" ADD CONSTRAINT "fk_backers_cf_id" FOREIGN KEY("cf_id")`
-`REFERENCES "campaign" ("cf_id");`
-
-We then manually imported our corresponding csv files into each new table within the database.
-The data was successfully imported. Due to the schema of the databse, the last available file for import was `backers.csv`. When it was finally imported into the database, we could see it within postgreSQL:
 
 ![backers_table](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers.png)
 
