@@ -23,12 +23,10 @@ Before constructing the database, we needed to extract relevant information from
 
 ![backer_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backer_info.png)
 
-The below block of code iterated through each row of the resulting DataFrame, first creating a list of lists. Each list item was a string that contained its own dictionary. The line `data = row[0]` sets the variable `data` equal to accessing the first index position 0 and sole element of each list. This sole element was a list containing a python dictionary wrapped in quotes as a string. The `json.loads()` function then took the string text of each row and converted it to a json file. Now that each row was a json file, we could iterate through it like a dictionary. Then, using list comprehension, we iterated through each row/dictionary and extracted the value for every key,value pair in the json format data. The line `row_values = [v for k,v in converted_data.items()]` specifically takes all of the values from each json format data row, and adds it to a list that pertains to every row of the DataFrame we wish to construct. 
+This code converts each key of the json object to columns and each value as the column fields in a pandas dataframe.
 
-
-
-
-
+`backers_df = pd.json_normalize(backer_df['backer_info'].apply(pd.io.json.loads))`
+`backers_df`
 
 ![backer_info_df](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/backers_d01.png)
 
