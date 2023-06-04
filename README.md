@@ -11,7 +11,7 @@ I transferred "Independent Funding" data from on premesis excel database to a Po
 
 ### Analysis
 
-The `backer_info.csv` file needed cleaning. I converted a dataframe json objects into a pandas dataframe with keys as columns and rows as object values.
+The `backer_info.csv` file needed cleaning. I converted a dataframe of json objects into a dataframe with keys as columns and rows as object values.
 `pd.set_option('max_colwidth', 400)`
 
 `backer_info = pd.read_csv("backer_info.csv")`
@@ -53,6 +53,11 @@ Refer to the [data_pipeline.ipynb script](https://github.com/willmino/Crowdfundi
 
 The Data Warehouse contained two important tables "email_contacts_remaining_goal_amount" and "email_backers_remaining_goal_amount".
 Each table provided the necessary contact information for either the invidiual backers or the campaign primary contact for notifications on each campaign's remaining funding ($) amount.
+
+![email_backers_remaining_goal_amount](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/email_backers_remaining_goal_amount.png)
+
+
+![email_contacts_remaining_goal_amount](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/email_contacts_remaining_goal_amount.png)
 
 ### Conclusion
 With this information, we were able to successfully contact every campaign backer and primary contact of the remaining funding goals.
