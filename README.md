@@ -2,6 +2,8 @@
 
 ## Overview
 
+![data_pipeline](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/pipeline.png)
+
 I transferred "Independent Funding" data from on premesis excel database to a Postgres Data Warehouse using an automated pipeline (Python + SQL).
 - ETL of particular CSV file
 - Raw data SQL database
