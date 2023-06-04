@@ -54,7 +54,7 @@ Refer to the [data_pipeline.ipynb script](https://github.com/willmino/Crowdfundi
 The Data Warehouse contained two important tables "email_contacts_remaining_goal_amount" and "email_backers_remaining_goal_amount".
 Each table provided the necessary contact information for either the invidiual backers or the campaign primary contact for notifications on each campaign's remaining funding ($) amount.
 
-![email_backers_remaining_goal_amount](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/email_backers_remaining_goal_amount.png)
+![email_backers_remaining_goal_amount](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/email_backers_remaining_amount.png)
 
 
 ![email_contacts_remaining_goal_amount](https://github.com/willmino/Crowdfunding-ETL/blob/main/images/email_contacts_remaining_goal_amount.png)
